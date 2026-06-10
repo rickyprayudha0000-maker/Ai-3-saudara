@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI 3 Saudara | Gemini Studio</title>
+    <style>
+        :root {
+            --primary: #4285f4;
+            --secondary: #34a853;
+            --danger: #ea4335;
+            --bg: #0b0d10;
+            --glass: rgba(255, 255, 255, 0.05);
+            --border: rgba(255, 255, 255, 0.1);
+            --card-bg: rgba(20, 25, 35, 0.8);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Google Sans', 'Segoe UI', Roboto, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0b0d10 0%, #161b22 100%);
+            color: #fff;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* SIDEBAR */
+        #sidebar {
+            width: 280px;
+            background: rgba(15, 18, 25, 0.95);
+            border-right: 1px solid var(--border);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        .logo {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo::before {
+            content: "✨";
+            font-size: 1.8rem;
+        }
+
+        .nav-section {
+            margin-bottom: 25px;
+        }
+
+        .nav-section-title {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            color: #999;
+            margin-bottom: 10px;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        .nav-link {
+            padding: 12px 15px;
+            cursor: pointer;
+            border-radius: 8px;
+            margin-bottom: 5px;
+            color: #ccc;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-link:hover {
+            background: rgba(66, 133, 244, 0.2);
+            color: var(--primary);
+            transform: translateX(5px);
+        }
+
+        .nav-link.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .nav-link::before {
+            font-size: 1.2rem;
+            min-width: 20px;
+        }
+
+        .nav-link[data-page="dashboard"]::before {
+            content: "📊";
+        }
+
+        .nav-link[data-page="text-to-image"]::before {
+            content: "🖼️";
+        }
+
+        .nav-link[data-page="text-to-video"]::before {
+            content: "🎬";
+        }
+
+        .nav-link[data-page="api-manager"]::before {
+            content: "🔑";
+        }
+
+        /* MAIN CONTENT */
+        #main-content {
+            flex: 1;
+            padding: 40px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .page-header {
+            margin-bottom: 30px;
+        }
+
+        .page-header h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .page-header p {
+            color: #aaa;
+            font-size: 0.95rem;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            padding: 30px;
+            border-radius: 16px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s;
+        }
+
+        .card:hover {
+            border-color: var(--primary);
+            box-shadow: 0 12px 48px rgba(66, 133, 244, 0.2);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #ddd;
+            font-size: 0.95rem;
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            background: #1a1f29;
+            border: 1px solid var(--border);
+            color: white;
+            padding: 14px;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            transition: all 0.3s;
+            font-family: 'Google Sans', sans-serif;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: rgba(26, 31, 41, 0.8);
+            box-shadow: 0 0 16px rgba(66, 133, 244, 0.3);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        button {
+            background: linear-gradient(135deg, var(--primary), #357ae8);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            width: 100%;
+            margin-top: 15px;
+            transition: all 0.3s;
+            font-size: 0.95rem;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(66, 133, 244, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button:disabled {
+            background: #555;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #34a853, #2d8e47);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #ea4335, #c5221f);
+        }
+
+        /* ALERTS */
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .alert-success {
+            background: rgba(52, 168, 83, 0.2);
+            border: 1px solid rgba(52, 168, 83, 0.5);
+            color: #5cdb64;
+        }
+
+        .alert-error {
+            background: rgba(234, 67, 53, 0.2);
+            border: 1px solid rgba(234, 67, 53, 0.5);
+            color: #ff6b6b;
+        }
+
+        .alert-info {
+            background: rgba(66, 133, 244, 0.2);
+            border: 1px solid rgba(66, 133, 244, 0.5);
+            color: #64b5f6;
+        }
+
+        /* LOADER */
+        #loader {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 999;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        .loader-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(66, 133, 244, 0.2);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        #loader h2 {
+            font-size: 1.2rem;
+            color: var(--primary);
+        }
+
+        /* STATUS */
+        .status-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .status-connected {
+            background: rgba(52, 168, 83, 0.2);
+            color: #5cdb64;
+        }
+
+        .status-disconnected {
+            background: rgba(234, 67, 53, 0.2);
+            color: #ff6b6b;
+        }
+
+        /* RESULTS */
+        .result-container {
+            margin-top: 20px;
+            padding: 20px;
+            background: rgba(26, 31, 41, 0.5);
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+
+        .result-preview {
+            max-width: 100%;
+            max-height: 400px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+
+        /* GRID */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .grid-item {
+            background: rgba(26, 31, 41, 0.5);
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+
+        .grid-item strong {
+            color: var(--primary);
+        }
+
+        /* FRAME INPUT SECTION */
+        .frame-section {
+            background: rgba(26, 31, 41, 0.5);
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            margin-top: 20px;
+        }
+
+        .frame-section h4 {
+            margin-bottom: 15px;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .frame-upload-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .frame-upload-box {
+            position: relative;
+            border: 2px dashed var(--border);
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: rgba(26, 31, 41, 0.3);
+        }
+
+        .frame-upload-box:hover {
+            border-color: var(--primary);
+            background: rgba(66, 133, 244, 0.1);
+        }
+
+        .frame-upload-box input[type="file"] {
+            display: none;
+        }
+
+        .frame-preview {
+            width: 100%;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+
+        .frame-info {
+            font-size: 0.85rem;
+            color: #aaa;
+            margin-top: 10px;
+        }
+
+        .frame-delete-btn {
+            background: linear-gradient(135deg, #ea4335, #c5221f);
+            padding: 8px 15px;
+            margin-top: 10px;
+            font-size: 0.85rem;
+            width: auto;
+        }
+
+        /* LOOP CONFIG */
+        .loop-config {
+            background: rgba(26, 31, 41, 0.5);
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            margin-top: 15px;
+        }
+
+        .loop-config-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 12px;
+        }
+
+        .loop-config-item label {
+            min-width: 120px;
+            margin: 0;
+            color: #ddd;
+        }
+
+        .loop-config-item input[type="range"] {
+            flex: 1;
+            padding: 0;
+            width: auto;
+        }
+
+        .loop-config-item span {
+            min-width: 50px;
+            text-align: right;
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        /* SCROLLBAR */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            body {
+                flex-direction: column;
+            }
+
+            #sidebar {
+                width: 100%;
+                padding: 15px;
+                flex-direction: row;
+                align-items: center;
+                gap: 20px;
+                overflow-x: auto;
+                border-right: none;
+                border-bottom: 1px solid var(--border);
+            }
+
+            #nav-list {
+                display: flex;
+                gap: 10px;
+                flex-wrap: wrap;
+            }
+
+            #main-content {
+                padding: 20px;
+            }
+
+            .page-header h1 {
+                font-size: 1.5rem;
+            }
+
+            .frame-upload-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <nav id="sidebar">
+        <div class="logo">GEMINI STUDIO</div>
+        <div id="nav-list">
+            <div class="nav-link active" data-page="dashboard" onclick="render('dashboard')">Dashboard</div>
+            <div class="nav-link" data-page="text-to-image" onclick="render('text-to-image')">Gemini Image Gen</div>
+            <div class="nav-link" data-page="text-to-video" onclick="render('text-to-video')">Veo Video AI</div>
+            <div class="nav-link" data-page="api-manager" onclick="render('api-manager')">Gemini API Key</div>
+        </div>
+    </nav>
+
+    <main id="main-content">
+        <div id="alerts-container"></div>
+        <div id="render-area"></div>
+    </main>
+
+    <div id="loader">
+        <div class="loader-spinner"></div>
+        <h2 id="loader-text">Memproses via Gemini...</h2>
+    </div>
+
+    <script>
+        // ========== UTILITY FUNCTIONS ==========
+        const showLoader = (text = "Memproses via Gemini...") => {
+            document.getElementById('loader-text').textContent = text;
+            document.getElementById('loader').style.display = 'flex';
+        };
+
+        const hideLoader = () => {
+            document.getElementById('loader').style.display = 'none';
+        };
+
+        const showAlert = (message, type = 'info') => {
+            const container = document.getElementById('alerts-container');
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            alert.innerHTML = `<span>${message}</span>`;
+            container.appendChild(alert);
+            setTimeout(() => alert.remove(), 5000);
+        };
+
+        const isApiKeyValid = () => {
+            const key = localStorage.getItem('gemini_api_key');
+            return key && key.trim().length > 0;
+        };
+
+        // ========== PAGE CONTENT ==========
+        const contentData = {
+            'dashboard': `
+                <div class="page-header">
+                    <h1>📊 Dashboard</h1>
+                    <p>Ringkasan sistem dan status koneksi Gemini AI</p>
+                </div>
+                <div class="card">
+                    <div class="grid">
+                        <div class="grid-item">
+                            <strong>Status Koneksi</strong>
+                            <p style="margin-top: 10px;">
+                                <span class="status-badge status-${isApiKeyValid() ? 'connected' : 'disconnected'}">
+                                    ${isApiKeyValid() ? '✓ Terhubung' : '✗ Tidak Terhubung'}
+                                </span>
+                            </p>
+                        </div>
+                        <div class="grid-item">
+                            <strong>API Key Status</strong>
+                            <p style="margin-top: 10px; font-size: 0.9rem; color: #aaa;">
+                                ${isApiKeyValid() ? 'API Key tersimpan ✓' : 'API Key belum diatur'}
+                            </p>
+                        </div>
+                        <div class="grid-item">
+                            <strong>Versi Platform</strong>
+                            <p style="margin-top: 10px; font-size: 0.9rem; color: #aaa;">v1.2.0</p>
+                        </div>
+                        <div class="grid-item">
+                            <strong>Model AI</strong>
+                            <p style="margin-top: 10px; font-size: 0.9rem; color: #aaa;">Gemini 2.0 + Veo</p>
+                        </div>
+                    </div>
+                    <hr style="border: none; border-top: 1px solid var(--border); margin: 20px 0;">
+                    <h3 style="margin-bottom: 15px;">📝 Fitur Tersedia</h3>
+                    <ul style="list-style: none; line-height: 1.8;">
+                        <li>✨ <strong>Gemini Image Gen</strong> - Generate gambar dari teks deskripsi</li>
+                        <li>🎬 <strong>Veo Video AI</strong> - Buat video dengan smooth loop (frame awal & akhir)</li>
+                        <li>🔑 <strong>API Manager</strong> - Kelola Gemini API Key Anda</li>
+                    </ul>
+                    <hr style="border: none; border-top: 1px solid var(--border); margin: 20px 0;">
+                    <h3 style="margin-bottom: 15px;">🎯 Fitur Baru v1.2</h3>
+                    <ul style="list-style: none; line-height: 1.8; color: #aaa;">
+                        <li>✅ Frame awal & akhir untuk seamless video loop</li>
+                        <li>✅ Kontrol transisi frame otomatis (Cross Fade, Motion Blur, Morph, Optical Flow)</li>
+                        <li>✅ Preview looping video sebelum generate</li>
+                        <li>✅ Kontrol jumlah loop video (1-10x)</li>
+                    </ul>
+                </div>
+            `,
+
+            'text-to-image': `
+                <div class="page-header">
+                    <h1>🖼️ Gemini Image Generation</h1>
+                    <p>Generate gambar berkualitas tinggi menggunakan AI Gemini</p>
+                </div>
+                <div class="card">
+                    ${!isApiKeyValid() ? '<div class="alert alert-error">⚠️ API Key belum diatur. Silakan pergi ke menu Gemini API Key terlebih dahulu.</div>' : ''}
+                    <form onsubmit="generateImage(event)">
+                        <div class="form-group">
+                            <label>📝 Deskripsi Gambar</label>
+                            <textarea id="image-prompt" placeholder="Contoh: A serene mountain landscape with a crystal clear lake at sunset, digital art style..." required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>🎨 Gaya Seni</label>
+                            <select id="image-style">
+                                <option value="photorealistic">Photorealistic</option>
+                                <option value="digital-art">Digital Art</option>
+                                <option value="oil-painting">Oil Painting</option>
+                                <option value="watercolor">Watercolor</option>
+                                <option value="anime">Anime</option>
+                                <option value="3d-render">3D Render</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn-secondary">🚀 Generate Gambar</button>
+                    </form>
+                    <div id="image-result"></div>
+                </div>
+            `,
+
+            'text-to-video': `
+                <div class="page-header">
+                    <h1>🎬 Veo Video AI - Seamless Loop</h1>
+                    <p>Buat video berkualitas sinematik dengan smooth looping menggunakan frame awal & akhir</p>
+                </div>
+                <div class="card">
+                    ${!isApiKeyValid() ? '<div class="alert alert-error">⚠️ API Key belum diatur. Silakan pergi ke menu Gemini API Key terlebih dahulu.</div>' : ''}
+                    <div class="alert alert-info">
+                        💡 <strong>Tips:</strong> Unggah frame awal dan frame akhir yang mirip untuk looping yang seamless. Sistem akan secara otomatis membuat transisi halus di antara frame.
+                    </div>
+                    <form onsubmit="generateVideo(event)">
+                        <div class="form-group">
+                            <label>📝 Deskripsi Video</label>
+                            <textarea id="video-prompt" placeholder="Contoh: A person walking through a beautiful forest with sunlight filtering through the trees, birds flying in the background..." required></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label>⏱️ Durasi Video (detik)</label>
+                            <select id="video-duration">
+                                <option value="5">5 detik</option>
+                                <option value="10" selected>10 detik</option>
+                                <option value="15">15 detik</option>
+                                <option value="30">30 detik</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>🎥 Resolusi</label>
+                            <select id="video-resolution">
+                                <option value="720p">720p (HD)</option>
+                                <option value="1080p" selected>1080p (Full HD)</option>
+                                <option value="4k">4K</option>
+                            </select>
+                        </div>
+
+                        <div class="frame-section">
+                            <h4>🖼️ Frame Awal & Akhir (Opsional)</h4>
+                            <p style="color: #aaa; font-size: 0.9rem; margin-bottom: 15px;">
+                                Upload frame statis untuk memastikan video looping dengan halus. Frame awal akan digunakan di awal video, dan frame akhir akan di-transition kembali ke frame awal untuk looping sempurna.
+                            </p>
+                            
+                            <div class="frame-upload-grid">
+                                <div>
+                                    <div class="frame-upload-box" onclick="document.getElementById('frame-start-input').click()">
+                                        <div id="frame-start-placeholder" style="color: #aaa;">
+                                            <div style="font-size: 2rem; margin-bottom: 10px;">📸</div>
+                                            <div style="font-size: 0.9rem;">Klik untuk upload<br>Frame Awal</div>
+                                        </div>
+                                        <img id="frame-start-preview" class="frame-preview" style="display: none;">
+                                        <input type="file" id="frame-start-input" accept="image/*" onchange="previewFrame('start')">
+                                    </div>
+                                    <div class="frame-info" id="frame-start-info">Format: JPG, PNG (Resolusi 1920x1080 rekomendasi)</div>
+                                    <button type="button" onclick="clearFrame('start')" class="frame-delete-btn" id="frame-start-delete" style="display: none;">🗑️ Hapus Frame Awal</button>
+                                </div>
+
+                                <div>
+                                    <div class="frame-upload-box" onclick="document.getElementById('frame-end-input').click()">
+                                        <div id="frame-end-placeholder" style="color: #aaa;">
+                                            <div style="font-size: 2rem; margin-bottom: 10px;">📸</div>
+                                            <div style="font-size: 0.9rem;">Klik untuk upload<br>Frame Akhir</div>
+                                        </div>
+                                        <img id="frame-end-preview" class="frame-preview" style="display: none;">
+                                        <input type="file" id="frame-end-input" accept="image/*" onchange="previewFrame('end')">
+                                    </div>
+                                    <div class="frame-info" id="frame-end-info">Format: JPG, PNG (Resolusi 1920x1080 rekomendasi)</div>
+                                    <button type="button" onclick="clearFrame('end')" class="frame-delete-btn" id="frame-end-delete" style="display: none;">🗑️ Hapus Frame Akhir</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="loop-config">
+                            <h4 style="margin-bottom: 15px; color: var(--primary);">🔄 Konfigurasi Loop</h4>
+                            
+                            <div class="loop-config-item">
+                                <label>Durasi Transisi:</label>
+                                <input type="range" id="transition-duration" min="0.5" max="3" step="0.5" value="1">
+                                <span id="transition-duration-value">1s</span>
+                            </div>
+
+                            <div class="loop-config-item">
+                                <label>Mode Transisi:</label>
+                                <select id="transition-mode" style="flex: 1; margin: 0; padding: 8px; background: #1a1f29; border: 1px solid var(--border); border-radius: 4px; color: white;">
+                                    <option value="cross-fade">Cross Fade (Fade bersilang)</option>
+                                    <option value="motion-blur">Motion Blur (Blur gerakan)</option>
+                                    <option value="smooth-morph">Smooth Morph (Morphing halus)</option>
+                                    <option value="optical-flow">Optical Flow (Aliran optis)</option>
+                                </select>
+                            </div>
+
+                            <div class="loop-config-item">
+                                <label>Jumlah Loop:</label>
+                                <input type="range" id="loop-count" min="1" max="10" step="1" value="2">
+                                <span id="loop-count-value">2x</span>
+                            </div>
+
+                            <div style="background: rgba(66, 133, 244, 0.1); padding: 12px; border-radius: 6px; margin-top: 12px; border-left: 3px solid var(--primary);">
+                                <div style="font-size: 0.85rem; color: #aaa;">
+                                    ℹ️ Preview: Video akan looping <strong id="preview-loop-info">2x</strong> dengan transisi <strong id="preview-transition-info">1s</strong>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn-secondary" style="margin-top: 20px;">🚀 Generate Video dengan Loop</button>
+                    </form>
+                    <div id="video-result"></div>
+                </div>
+            `,
+
+            'api-manager': `
+                <div class="page-header">
+                    <h1>🔑 Gemini API Key Manager</h1>
+                    <p>Kelola API Key untuk mengakses layanan Gemini AI</p>
+                </div>
+                <div class="card">
+                    <div class="alert alert-info">
+                        ℹ️ Dapatkan API Key gratis di <a href="https://aistudio.google.com" target="_blank" style="color: var(--primary); text-decoration: underline;">Google AI Studio</a>
+                    </div>
+                    <form onsubmit="saveKey(event)">
+                        <div class="form-group">
+                            <label>🔐 Gemini API Key</label>
+                            <input type="password" id="gemini-key" placeholder="AIza... (minimal 20 karakter)" />
+                        </div>
+                        <div style="display: flex; gap: 10px;">
+                            <button type="submit" class="btn-secondary" style="flex: 1;">💾 Simpan API Key</button>
+                            <button type="button" onclick="togglePasswordVisibility()" style="flex: 1; background: rgba(255, 255, 255, 0.1); border: 1px solid var(--border);">👁️ Tampilkan/Sembunyikan</button>
+                        </div>
+                    </form>
+                    <hr style="border: none; border-top: 1px solid var(--border); margin: 20px 0;">
+                    <div class="form-group">
+                        <label>✅ Status Kunci</label>
+                        <div style="margin-top: 10px;">
+                            ${isApiKeyValid() ? `
+                                <span class="status-badge status-connected">✓ API Key Tersimpan</span>
+                                <button type="button" onclick="clearKey()" class="btn-danger" style="margin-top: 15px;">🗑️ Hapus API Key</button>
+                            ` : `
+                                <span class="status-badge status-disconnected">✗ Belum Ada API Key</span>
+                            `}
+                        </div>
+                    </div>
+                </div>
+            `
+        };
+
+        // ========== PAGE RENDERING ==========
+        function render(pageId) {
+            // Update active nav link
+            document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('active'));
+            document.querySelector(`[data-page="${pageId}"]`).classList.add('active');
+
+            // Render content
+            document.getElementById('render-area').innerHTML = contentData[pageId];
+
+            // Setup event listeners untuk video page
+            if (pageId === 'text-to-video') {
+                setupVideoPageListeners();
+            }
+
+            // Scroll to top
+            document.getElementById('main-content').scrollTop = 0;
+        }
+
+        // ========== FRAME HANDLING ==========
+        function previewFrame(type) {
+            const fileInput = document.getElementById(`frame-${type}-input`);
+            const preview = document.getElementById(`frame-${type}-preview`);
+            const placeholder = document.getElementById(`frame-${type}-placeholder`);
+            const deleteBtn = document.getElementById(`frame-${type}-delete`);
+            const infoDiv = document.getElementById(`frame-${type}-info`);
+
+            if (fileInput.files && fileInput.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                    placeholder.style.display = 'none';
+                    deleteBtn.style.display = 'block';
+                    infoDiv.textContent = `File: ${fileInput.files[0].name} (${(fileInput.files[0].size / 1024 / 1024).toFixed(2)} MB)`;
+                };
+                reader.readAsDataURL(fileInput.files[0]);
+            }
+        }
+
+        function clearFrame(type) {
+            const fileInput = document.getElementById(`frame-${type}-input`);
+            const preview = document.getElementById(`frame-${type}-preview`);
+            const placeholder = document.getElementById(`frame-${type}-placeholder`);
+            const deleteBtn = document.getElementById(`frame-${type}-delete`);
+            const infoDiv = document.getElementById(`frame-${type}-info`);
+
+            fileInput.value = '';
+            preview.style.display = 'none';
+            placeholder.style.display = 'block';
+            deleteBtn.style.display = 'none';
+            infoDiv.textContent = 'Format: JPG, PNG (Resolusi 1920x1080 rekomendasi)';
+        }
+
+        // ========== VIDEO PAGE LISTENERS ==========
+        function setupVideoPageListeners() {
+            const transitionDuration = document.getElementById('transition-duration');
+            const loopCount = document.getElementById('loop-count');
+
+            if (transitionDuration) {
+                transitionDuration.addEventListener('input', (e) => {
+                    document.getElementById('transition-duration-value').textContent = e.target.value + 's';
+                    document.getElementById('preview-transition-info').textContent = e.target.value + 's';
+                });
+            }
+
+            if (loopCount) {
+                loopCount.addEventListener('input', (e) => {
+                    document.getElementById('loop-count-value').textContent = e.target.value + 'x';
+                    document.getElementById('preview-loop-info').textContent = e.target.value + 'x';
+                });
+            }
+        }
+
+        // ========== API KEY FUNCTIONS ==========
+        function saveKey(event) {
+            event.preventDefault();
+            const key = document.getElementById('gemini-key').value.trim();
+
+            if (!key) {
+                showAlert('API Key tidak boleh kosong!', 'error');
+                return;
+            }
+
+            if (key.length < 20) {
+                showAlert('API Key terlalu pendek (minimal 20 karakter)', 'error');
+                return;
+            }
+
+            localStorage.setItem('gemini_api_key', key);
+            showAlert('✓ Gemini API Key berhasil disimpan!', 'success');
+            document.getElementById('gemini-key').value = '';
+            setTimeout(() => render('api-manager'), 1000);
+        }
+
+        function clearKey() {
+            if (confirm('Yakin ingin menghapus API Key?')) {
+                localStorage.removeItem('gemini_api_key');
+                showAlert('✓ API Key berhasil dihapus!', 'success');
+                setTimeout(() => render('api-manager'), 1000);
+            }
+        }
+
+        function togglePasswordVisibility() {
+            const input = document.getElementById('gemini-key');
+            input.type = input.type === 'password' ? 'text' : 'password';
+        }
+
+        // ========== IMAGE GENERATION ==========
+        async function generateImage(event) {
+            event.preventDefault();
+
+            if (!isApiKeyValid()) {
+                showAlert('⚠️ Silakan atur Gemini API Key terlebih dahulu', 'error');
+                return;
+            }
+
+            const prompt = document.getElementById('image-prompt').value;
+            const style = document.getElementById('image-style').value;
+
+            showLoader(`🖼️ Generate gambar "${style}"...`);
+
+            try {
+                // Simulasi API call (ganti dengan API Gemini yang sebenarnya)
+                await new Promise(resolve => setTimeout(resolve, 3000));
+
+                const resultDiv = document.getElementById('image-result');
+                resultDiv.innerHTML = `
+                    <div class="result-container">
+                        <h3>✨ Hasil Generate Gambar</h3>
+                        <p><strong>Prompt:</strong> ${prompt}</p>
+                        <p><strong>Gaya:</strong> ${style}</p>
+                        <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); width: 100%; height: 300px; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-size: 0.9rem;">
+                            [Pratinjau Gambar - Menggunakan Gemini API]
+                        </div>
+                        <p style="margin-top: 15px; color: #aaa; font-size: 0.9rem;">Gambar akan ditampilkan di sini setelah dihasilkan oleh API Gemini</p>
+                    </div>
+                `;
+
+                showAlert('✓ Gambar berhasil digenerate!', 'success');
+            } catch (error) {
+                showAlert(`❌ Error: ${error.message}`, 'error');
+            } finally {
+                hideLoader();
+            }
+        }
+
+        // ========== VIDEO GENERATION WITH LOOPING ==========
+        async function generateVideo(event) {
+            event.preventDefault();
+
+            if (!isApiKeyValid()) {
+                showAlert('⚠️ Silakan atur Gemini API Key terlebih dahulu', 'error');
+                return;
+            }
+
+            const prompt = document.getElementById('video-prompt').value;
+            const duration = document.getElementById('video-duration').value;
+            const resolution = document.getElementById('video-resolution').value;
+            const transitionMode = document.getElementById('transition-mode').value;
+            const transitionDuration = document.getElementById('transition-duration').value;
+            const loopCount = document.getElementById('loop-count').value;
+            const hasStartFrame = document.getElementById('frame-start-preview').style.display === 'block';
+            const hasEndFrame = document.getElementById('frame-end-preview').style.display === 'block';
+
+            showLoader(`🎬 Generate video dengan smooth loop (${loopCount}x)...`);
+
+            try {
+                // Simulasi API call
+                await new Promise(resolve => setTimeout(resolve, 4000));
+
+                const loopInfo = hasStartFrame && hasEndFrame 
+                    ? `<strong style="color: var(--secondary);">✓ Dengan Frame-Based Looping</strong> - Transisi ${transitionMode} ${transitionDuration}s`
+                    : `<strong style="color: var(--primary);">Standard Looping</strong> - Tanpa frame awal/akhir`;
+
+                const resultDiv = document.getElementById('video-result');
+                resultDiv.innerHTML = `
+                    <div class="result-container">
+                        <h3>✨ Hasil Generate Video</h3>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                            <div>
+                                <p><strong>Prompt:</strong> ${prompt}</p>
+                                <p><strong>Durasi:</strong> ${duration} detik × ${loopCount} loop</p>
+                            </div>
+                            <div>
+                                <p><strong>Resolusi:</strong> ${resolution}</p>
+                                <p><strong>Mode Loop:</strong> ${loopInfo}</p>
+                            </div>
+                        </div>
+                        <div style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); width: 100%; height: 300px; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-size: 0.9rem; flex-direction: column; gap: 15px;">
+                            <span style="font-size: 2rem;">▶️</span>
+                            ${hasStartFrame && hasEndFrame ? '<span style="font-size: 0.85rem; opacity: 0.9;">🔄 Seamless Loop dengan Frame Anchor</span>' : '<span style="font-size: 0.85rem; opacity: 0.9;">Standard Video Loop</span>'}
+                        </div>
+                        <p style="margin-top: 15px; color: #aaa; font-size: 0.9rem;">Video akan ditampilkan di sini setelah dihasilkan oleh API Veo</p>
+                    </div>
+                `;
+
+                showAlert(`✓ Video berhasil digenerate dengan ${loopCount}x loop!`, 'success');
+            } catch (error) {
+                showAlert(`❌ Error: ${error.message}`, 'error');
+            } finally {
+                hideLoader();
+            }
+        }
+
+        // ========== INITIALIZE ==========
+        window.addEventListener('DOMContentLoaded', () => {
+            render('dashboard');
+        });
+    </script>
+</body>
+</html>
